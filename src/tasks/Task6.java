@@ -7,6 +7,7 @@ import common.Task;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +24,20 @@ public class Task6 implements Task {
   private Set<String> getPersonDescriptions(Collection<Person> persons,
                                             Map<Integer, Set<Integer>> personAreaIds,
                                             Collection<Area> areas) {
-    return new HashSet<>();
+    HashSet<String> output = new HashSet<>();
+    Map<Integer,String> areaHelper = new HashMap<>();
+
+    areas.forEach( a -> areaHelper.put(a.getId(), a.getName()));
+
+    persons.forEach(
+      (p) -> {
+        personAreaIds.get(p.getId()).forEach((a) -> {
+            output.add(p.getFirstName() + " - " + areaHelper.get(a));
+        });
+      }
+    );
+
+    return output;
   }
 
   @Override

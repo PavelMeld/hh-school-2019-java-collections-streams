@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.time.Instant;
+import java.util.function.BiFunction;
 
 /*
 А теперь о горьком
@@ -23,23 +25,20 @@ P.P.S Здесь ваши правки желательно прокоммент
  */
 public class Task8 implements Task {
 
-  private long count;
-
   //Не хотим выдывать апи нашу фальшивую персону, поэтому конвертим начиная со второй
+  // @PavelMeld : Оригинал изменял список persons, так нельзя
   public List<String> getNames(List<Person> persons) {
-    if (persons.size() == 0) {
-      return Collections.emptyList();
-    }
-    persons.remove(0);
-    return persons.stream().map(Person::getFirstName).collect(Collectors.toList());
+    return persons.stream().skip(1).map(Person::getFirstName).collect(Collectors.toList());
   }
 
   //ну и различные имена тоже хочется
+  //@PavelMeld : ok
   public Set<String> getDifferentNames(List<Person> persons) {
     return getNames(persons).stream().distinct().collect(Collectors.toSet());
   }
 
   //Для фронтов выдадим полное имя, а то сами не могут
+  // @PavelMeld : ok
   public String convertPersonToString(Person person) {
     String result = "";
     if (person.getSecondName() != null) {
@@ -58,39 +57,58 @@ public class Task8 implements Task {
 
   // словарь id персоны -> ее имя
   public Map<Integer, String> getPersonNames(Collection<Person> persons) {
-    Map<Integer, String> map = new HashMap<>(1);
-    for (Person person : persons) {
-      if (!map.containsKey(person.getId())) {
-        map.put(person.getId(), convertPersonToString(person));
-      }
-    }
+    Map<Integer, String> map = new HashMap();
+
+    // @PavelMeld : Очень хотелось сделать целиком через стрим, но оригинальная версия
+    // мне нравится больше, добавил в нее чуть-чуть стрима. 
+
+    persons.stream()
+      .distinct()
+      .forEach( p -> map.put(p.getId(), p.getFirstName()) );
+
+    // return persons.stream()
+    //   .distinct()
+    //   .collect(
+    //     Collectors.groupingBy(
+    //       Person::getId, 
+    //       Collectors.mapping(Person::getFirstName, Collectors.joining())
+    //     )
+    //   );
+
     return map;
   }
 
   // есть ли совпадающие в двух коллекциях персоны?
   public boolean hasSamePersons(Collection<Person> persons1, Collection<Person> persons2) {
-    boolean has = false;
-    for (Person person1 : persons1) {
-      for (Person person2 : persons2) {
-        if (person1.equals(person2)) {
-          has = true;
-        }
-      }
-    }
-    return has;
+    for (Person person1 : persons1)
+      for (Person person2 : persons2)
+        if (person1.equals(person2))
+          return true;
+
+    return false;
   }
 
   //Выглядит вроде неплохо...
+  // @PavelMeld : Не очень идея - использовать глобальную переменную.
+  // Переменная больше не нужна - убрал из описания класса
+  // Да и вообще - переменную, если есть Stream::count
   public long countEven(Stream<Integer> numbers) {
-    count = 0;
-    numbers.filter(num -> num % 2 == 0).forEach(num -> count++);
-    return count;
+    return numbers.filter(num -> num % 2 == 0).count();
   }
 
   @Override
   public boolean check() {
+    Person  p1, p2, p3, p4;
+
+    p1 = new Person(1, "123", Instant.now());
+    p2 = new Person(2, "223", Instant.now());
+    p3 = new Person(3, "323", Instant.now());
+    p4 = new Person(4, "423", Instant.now());
+
+    Map<Integer, String> mappedIds = getPersonNames(List.of(p1, p2, p1, p3, p4));
+
     System.out.println("Слабо дойти до сюда и исправить Fail этой таски?");
-    boolean codeSmellsGood = false;
+    boolean codeSmellsGood = true;
     boolean reviewerDrunk = false;
     return codeSmellsGood || reviewerDrunk;
   }

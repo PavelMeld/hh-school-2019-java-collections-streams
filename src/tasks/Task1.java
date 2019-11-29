@@ -8,7 +8,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -26,25 +28,19 @@ public class Task1 implements Task {
   // !!! Редактируйте этот метод !!!
   private List<Person> findOrderedPersons(List<Integer> personIds) {
     Set<Person> persons = PersonService.findPersons(personIds); 
-    Map<Integer,Integer> permutations = new HashMap<>();
-    Person[] ordered = new Person[personIds.size()];
-  
-    // Create hepler Map { id => index }
-    for (int n=0; n<personIds.size(); n++)
-      permutations.put(personIds.get(n), n);
+    Map<Integer,Person> idToPersonMap;
 
-    // Put persons to correct places at Person array
-    for (Person p : persons) {
-      Integer index = permutations.get(p.getId());
-      ordered[index] = p;
-    }
+    idToPersonMap = persons.stream()
+      .collect( Collectors.toMap( Person::getId, p -> p ));
 
-    return Arrays.asList(ordered);
+    return personIds.stream()
+      .map( idToPersonMap::get )
+      .collect(Collectors.toList());
   }
 
   @Override
   public boolean check() {
-    List<Integer> ids = List.of(1, 2, 3);
+    List<Integer> ids = List.of(43, 21, 34);
 
     return findOrderedPersons(ids).stream()
         .map(Person::getId)

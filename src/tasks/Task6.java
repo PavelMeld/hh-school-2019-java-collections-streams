@@ -6,11 +6,15 @@ import common.Task;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.stream.Collectors;
 import java.util.HashSet;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.AbstractMap;
 
 /*
 Имеются
@@ -24,20 +28,16 @@ public class Task6 implements Task {
   private Set<String> getPersonDescriptions(Collection<Person> persons,
                                             Map<Integer, Set<Integer>> personAreaIds,
                                             Collection<Area> areas) {
-    HashSet<String> output = new HashSet<>();
-    Map<Integer,String> areaHelper = new HashMap<>();
 
-    areas.forEach( a -> areaHelper.put(a.getId(), a.getName()));
+    Map<Integer,String> areaIdToNameMap = areas.stream()
+      .collect(Collectors.toMap(Area::getId, Area::getName));
 
-    persons.forEach(
-      (p) -> {
-        personAreaIds.get(p.getId()).forEach((a) -> {
-            output.add(p.getFirstName() + " - " + areaHelper.get(a));
-        });
-      }
-    );
-
-    return output;
+    return persons.stream()
+      .flatMap( 
+          person -> personAreaIds.getOrDefault(person.getId(), Collections.emptySet()).stream()
+                      .map( areaId -> person.getFirstName() + " - "+areaIdToNameMap.get(areaId))
+      )
+      .collect( Collectors.toSet() );
   }
 
   @Override

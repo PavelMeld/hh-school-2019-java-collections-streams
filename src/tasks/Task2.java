@@ -6,6 +6,7 @@ import common.Task;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,12 +25,11 @@ public class Task2 implements Task {
                                                       Collection<Person> persons2,
                                                       int limit) {
 
-    List<Person> ordered = Stream.concat(persons1.stream(), persons2.stream())
-      .sorted( (a, b) -> new Long(a.getCreatedAt().toEpochMilli()).compareTo(b.getCreatedAt().toEpochMilli()) )
+    return Stream.concat(persons1.stream(), persons2.stream())
+      .sorted( Comparator.comparing(Person::getCreatedAt) )
       .limit(limit)
       .collect(Collectors.toList());
 
-    return ordered;
   }
 
   @Override
@@ -40,6 +40,7 @@ public class Task2 implements Task {
         new Person(2, "Person 2", time.plusSeconds(1))
     );
     Collection<Person> persons2 = Set.of(
+        new Person(5, "Person 4", time.plusSeconds(3)),
         new Person(3, "Person 3", time.minusSeconds(1)),
         new Person(4, "Person 4", time.plusSeconds(2))
     );

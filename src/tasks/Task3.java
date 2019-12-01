@@ -21,21 +21,9 @@ public class Task3 implements Task {
     List<Person> sorted;
 
     sorted =  persons.stream()
-      .sorted(
-        (a, b) -> {
-          int vs;
-
-          vs = a.getSecondName().compareTo(b.getSecondName());
-          if (vs != 0) 
-            return vs;
-
-          vs = a.getFirstName().compareTo(b.getFirstName());
-          if (vs != 0) 
-            return vs;
-
-          return new Long(a.getCreatedAt().toEpochMilli()).compareTo(b.getCreatedAt().toEpochMilli());
-        }
-      )
+      .sorted(Comparator.comparing(Person::getSecondName)
+				.thenComparing(Person::getFirstName)
+				.thenComparing(Person::getCreatedAt))
       .collect(Collectors.toList());
 
      return sorted;

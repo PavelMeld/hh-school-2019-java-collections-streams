@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -40,52 +41,27 @@ public class Task8 implements Task {
   //Для фронтов выдадим полное имя, а то сами не могут
   // @PavelMeld : ok
   public String convertPersonToString(Person person) {
-    String result = "";
-    if (person.getSecondName() != null) {
-      result += person.getSecondName();
-    }
+  
+    return Stream.of(person.getSecondName(), person.getFirstName(), person.getMiddleName())
+      .filter(text -> text != null)
+      .collect(Collectors.joining(" "));
 
-    if (person.getFirstName() != null) {
-      result += " " + person.getFirstName();
-    }
-
-    if (person.getSecondName() != null) {
-      result += " " + person.getSecondName();
-    }
-    return result;
   }
 
   // словарь id персоны -> ее имя
   public Map<Integer, String> getPersonNames(Collection<Person> persons) {
-    Map<Integer, String> map = new HashMap();
 
-    // @PavelMeld : Очень хотелось сделать целиком через стрим, но оригинальная версия
-    // мне нравится больше, добавил в нее чуть-чуть стрима. 
+    return persons.stream()
+            .distinct()
+            .collect(Collectors.toMap(Person::getId, Person::getFirstName));
 
-    persons.stream()
-      .distinct()
-      .forEach( p -> map.put(p.getId(), p.getFirstName()) );
-
-    // return persons.stream()
-    //   .distinct()
-    //   .collect(
-    //     Collectors.groupingBy(
-    //       Person::getId, 
-    //       Collectors.mapping(Person::getFirstName, Collectors.joining())
-    //     )
-    //   );
-
-    return map;
   }
 
   // есть ли совпадающие в двух коллекциях персоны?
   public boolean hasSamePersons(Collection<Person> persons1, Collection<Person> persons2) {
-    for (Person person1 : persons1)
-      for (Person person2 : persons2)
-        if (person1.equals(person2))
-          return true;
-
-    return false;
+    return persons1.stream()
+            .filter(persons2::contains)
+            .count() > 0 ? true : false;
   }
 
   //Выглядит вроде неплохо...
@@ -98,14 +74,21 @@ public class Task8 implements Task {
 
   @Override
   public boolean check() {
-    Person  p1, p2, p3, p4;
+    Person  p1, p2, p3, p4, p5;
 
-    p1 = new Person(1, "123", Instant.now());
+    p1 = new Person(1, "123", "bgf", Instant.now());
     p2 = new Person(2, "223", Instant.now());
     p3 = new Person(3, "323", Instant.now());
     p4 = new Person(4, "423", Instant.now());
+    p5 = new Person(4, "423", Instant.now());
 
-    Map<Integer, String> mappedIds = getPersonNames(List.of(p1, p2, p1, p3, p4));
+    System.out.println("<"+convertPersonToString(p2)+">");
+
+    getPersonNames(List.of(p1, p2, p3)).forEach(
+      (k, v) -> System.out.println(k+" "+v)
+    );
+
+    System.out.println(hasSamePersons(List.of(p1,p2), List.of(p3,p1)));
 
     System.out.println("Слабо дойти до сюда и исправить Fail этой таски?");
     boolean codeSmellsGood = true;

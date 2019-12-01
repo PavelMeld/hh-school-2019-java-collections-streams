@@ -17,8 +17,8 @@ public class Task7 implements Task {
     HashSet<String> vacancies = new HashSet<>();
     
     companies.forEach( 
-      (c) -> c.getVacancies().forEach(
-        (v) -> vacancies.add(v.getTitle())
+      company -> company.getVacancies().forEach(
+        vacancy -> vacancies.add(vacancy.getTitle())
       )
     );
     return vacancies;

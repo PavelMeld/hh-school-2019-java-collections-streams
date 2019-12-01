@@ -5,6 +5,7 @@ import common.Task;
 import common.Vacancy;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,14 +15,12 @@ import java.util.Set;
 public class Task7 implements Task {
 
   private Set<String> vacancyNames(Collection<Company> companies) {
-    HashSet<String> vacancies = new HashSet<>();
     
-    companies.forEach( 
-      company -> company.getVacancies().forEach(
-        vacancy -> vacancies.add(vacancy.getTitle())
-      )
-    );
-    return vacancies;
+    return companies.stream()
+      .flatMap(company -> company.getVacancies().stream())
+      .distinct()
+      .map(Vacancy::getTitle)
+      .collect(Collectors.toSet());
   }
 
   @Override

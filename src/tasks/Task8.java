@@ -35,13 +35,13 @@ public class Task8 implements Task {
   //ну и различные имена тоже хочется
   //@PavelMeld : ok
   public Set<String> getDifferentNames(List<Person> persons) {
-    return getNames(persons).stream().distinct().collect(Collectors.toSet());
+    return getNames(persons).stream().collect(Collectors.toSet());
   }
 
   //Для фронтов выдадим полное имя, а то сами не могут
   // @PavelMeld : ok
   public String convertPersonToString(Person person) {
-  
+
     return Stream.of(person.getSecondName(), person.getFirstName(), person.getMiddleName())
       .filter(text -> text != null)
       .collect(Collectors.joining(" "));

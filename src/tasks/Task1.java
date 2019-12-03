@@ -27,10 +27,7 @@ public class Task1 implements Task {
 
   // !!! Редактируйте этот метод !!!
   private List<Person> findOrderedPersons(List<Integer> personIds) {
-    Set<Person> persons = PersonService.findPersons(personIds); 
-    Map<Integer,Person> idToPersonMap;
-
-    idToPersonMap = persons.stream()
+    Map<Integer,Person> idToPersonMap = PersonService.findPersons(personIds).stream()
       .collect( Collectors.toMap( Person::getId, p -> p ));
 
     return personIds.stream()

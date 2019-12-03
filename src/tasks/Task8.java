@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.time.Instant;
@@ -33,13 +34,13 @@ public class Task8 implements Task {
   }
 
   //ну и различные имена тоже хочется
-  //@PavelMeld : ok
+  //@PavelMeld : убрал стрим
   public Set<String> getDifferentNames(List<Person> persons) {
-    return getNames(persons).stream().collect(Collectors.toSet());
+    return new HashSet<>(getNames(persons));
   }
 
   //Для фронтов выдадим полное имя, а то сами не могут
-  // @PavelMeld : ok
+  //@PavelMeld : Stream-style join
   public String convertPersonToString(Person person) {
 
     return Stream.of(person.getSecondName(), person.getFirstName(), person.getMiddleName())
@@ -52,16 +53,19 @@ public class Task8 implements Task {
   public Map<Integer, String> getPersonNames(Collection<Person> persons) {
 
     return persons.stream()
-            .distinct()
-            .collect(Collectors.toMap(Person::getId, Person::getFirstName));
+            .collect(
+				Collectors.toMap(Person::getId, Person::getFirstName, (a,b) -> a)
+			);
 
   }
 
   // есть ли совпадающие в двух коллекциях персоны?
+  // @PavelMeld: Заменил Collection::contains на HashSet::contains
+  // c постоянным временем доступа
   public boolean hasSamePersons(Collection<Person> persons1, Collection<Person> persons2) {
+	
     return persons1.stream()
-            .filter(persons2::contains)
-            .count() > 0 ? true : false;
+            .anyMatch(new HashSet<>(persons2)::contains);
   }
 
   //Выглядит вроде неплохо...
@@ -84,11 +88,13 @@ public class Task8 implements Task {
 
     System.out.println("<"+convertPersonToString(p2)+">");
 
-    getPersonNames(List.of(p1, p2, p3)).forEach(
+    getPersonNames(List.of(p1, p2, p1, p3)).forEach(
       (k, v) -> System.out.println(k+" "+v)
     );
 
     System.out.println(hasSamePersons(List.of(p1,p2), List.of(p3,p1)));
+    System.out.println(hasSamePersons(List.of(p1,p2), List.of(p3,p4)));
+	System.out.println("Count even " + countEven(Stream.of(0)));
 
     System.out.println("Слабо дойти до сюда и исправить Fail этой таски?");
     boolean codeSmellsGood = true;

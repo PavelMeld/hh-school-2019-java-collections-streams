@@ -18,7 +18,6 @@ public class Task7 implements Task {
     
     return companies.stream()
       .flatMap(company -> company.getVacancies().stream())
-      .distinct()
       .map(Vacancy::getTitle)
       .collect(Collectors.toSet());
   }
